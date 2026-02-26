@@ -1,0 +1,35 @@
+# Python
+__pycache_/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+*.egg
+
+# MLServe
+mlserve.db
+mlserve_artifacts/
+build_contexts/
+
+# Environment
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+*.tar
+
+src
+tests
+infrastructure
+
