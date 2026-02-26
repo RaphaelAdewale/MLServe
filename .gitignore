@@ -29,7 +29,3 @@ Thumbs.db
 # Docker
 *.tar
 
-src
-tests
-infrastructure
-
