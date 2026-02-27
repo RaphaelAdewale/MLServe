@@ -1,0 +1,32 @@
+FROM python:3.11-slim
+
+# Prevent Python from writing .pyc files and enable unbuffered output
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+# Install framework-specific requirements
+COPY requirements.txt /app/requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the serving runtime code
+COPY server.py /app/server.py
+COPY model_loader.py /app/model_loader.py
+
+# Copy the model artifact
+COPY model/ /app/model/
+
+# Environment variables (overridden at container run time)
+ENV MODEL_NAME={{ model_name }}
+ENV MODEL_PATH=/app/model/{{ model_filename }}
+ENV MODEL_VERSION={{ version }}
+ENV FRAMEWORK={{ framework }}
+ENV PORT=8080
+
+EXPOSE 8080
+
+HEALTHCHECK --interval=10s --timeout=3s --retries=3 --start-period=15s \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8080/health')" || exit 1
+
+CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8080", "--workers", "1"]
