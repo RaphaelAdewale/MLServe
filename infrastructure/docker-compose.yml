@@ -1,0 +1,41 @@
+services:
+  # --- API Gateway ---
+  traefik:
+    image: traefik:v3
+    command:
+      - "--api.dashboard=true"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=mlserve-network"
+      - "--entrypoints.web.address=:80"
+      - "--log.level=INFO"
+    environment:
+      - DOCKER_API_VERSION=1.44
+    ports:
+      - "80:80"       # HTTP traffic
+      - "8080:8080"   # Traefik dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - mlserve-network
+    restart: unless-stopped
+
+  # --- Container Registry (local) ---
+  registry:
+    image: registry:2
+    ports:
+      - "5000:5000"
+    volumes:
+      - registry-data:/var/lib/registry
+    networks:
+      - mlserve-network
+    restart: unless-stopped
+
+volumes:
+  registry-data:
+
+networks:
+  mlserve-network:
+    name: mlserve-network
+    driver: bridge
